@@ -44,7 +44,7 @@ int status=0;
 #define RightMotorDirPin2B 6    //Rear Right Motor direction pin 2 to Model-Y M_A IN2 ( K1) 
 #define LeftMotorDirPin1B 7    //Rear Left Motor direction pin 1 to Model-Y M_A IN3  (K3)
 #define LeftMotorDirPin2B 8  //Rear Left Motor direction pin 2 to Model-Y M_A IN4 (K3)
-#define speedPinLB 13    //  Rear Wheel PWM pin connect Model-Y M_A ENB
+#define speedPinLB 12    //  Rear Wheel PWM pin connect Model-Y M_A ENB
 
 #define sensor1   A4 // Left most sensor
 #define sensor2   A3 // 2nd Left   sensor
@@ -255,7 +255,7 @@ void setup()
 }
 
 void loop(){
- // tracking();
+  //tracking();
  do_Uart_Tick();
 
 }
@@ -273,13 +273,14 @@ void tracking()
   senstr= String(sensorvalue,BIN);
   senstr=senstr.substring(1,6);
   
-  Serial.print(senstr);
+  //Serial.print(senstr);
+   Serial.print("working");
   Serial.print("\t");
   Serial.print("\n");
  
  
 
-  if (senstr=="01000" || senstr=="11000")
+  if ( senstr=="01000" || senstr=="11000")
    {
      Serial.println(" Shift Left");
       sharpLeftTurn(LOW_SPEED,MID_SPEED);
@@ -287,8 +288,12 @@ void tracking()
       delay(DELAY_TIME);
       stop_bot();     
    }
+
+   if(senstr=="10000"){
+    sharpRightTurn(LOW_SPEED,0);
+   }
    
-  if (senstr=="10000" || senstr=="11100" || senstr=="10100" )
+  if ( senstr=="11100" || senstr=="10100" )
   {
      Serial.println("Slight Shift Left");
       forward(0,HIGH_SPEED);
@@ -324,7 +329,7 @@ void tracking()
  if (senstr=="00001"||senstr=="00010" || senstr=="00011")
  {
    Serial.println("Shift to Right");
-   sharpRightTurn(MID_SPEED,LOW_SPEED);
+   sharpLeftTurn(MID_SPEED,LOW_SPEED);
    // forward(LOW_SPEED,LOW_SPEED);
     //  right_shift(HIGH_SPEED,HIGH_SPEED,HIGH_SPEED,HIGH_SPEED);
       delay(DELAY_TIME);
@@ -332,7 +337,7 @@ void tracking()
         
  }
   if (  senstr=="00000"){
-      forward(HIGH_SPEED,HIGH_SPEED);
+      forward(LOW_SPEED,LOW_SPEED);
       delay(DELAY_TIME/2*3);
       stop_bot();  
   }
@@ -419,23 +424,44 @@ void do_Uart_Tick()
    Serial.print("\n");
 
 
+
    while(status==5){
      tracking();
-      if(buffUARTIndex > 0 && (millis() - preUARTTick >= 100))//APP send flag to modify the obstacle avoidance parameters
-   { //data ready
+  //data ready
+    if(Serial1.available()) 
+  {
+    size_t len = Serial1.available();
+    uint8_t sbuf[len + 1];
+    sbuf[len] = 0x00;
+    Serial1.readBytes(sbuf, len);
+    //parseUartPackage((char*)sbuf);
+    memcpy(buffUART + buffUARTIndex, sbuf, len);//ensure that the serial port can read the entire frame of data
+    buffUARTIndex += len;
+    preUARTTick = millis();
+    if(buffUARTIndex >= MAX_PACKETSIZE - 1) 
+    {
+      buffUARTIndex = MAX_PACKETSIZE - 2;
+      preUARTTick = preUARTTick - 200;
+    }
+  }
     buffUART[buffUARTIndex] = 0x00;
     Uart_Date=buffUART[0];
     cs=get_status(buffUART);
     car_direction=cs.angle;
     buffUARTIndex = 0;
+      Serial.print(Uart_Date=='I');
+
 
       if(Uart_Date=='I'){
         status=0;
+           Serial.print(status);
+           Serial.print("\n");
         stop_bot(); 
-        break;
+      
       }
-    }
+  
 
    }
+   
   
 }
