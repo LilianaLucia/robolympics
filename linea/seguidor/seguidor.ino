@@ -24,7 +24,7 @@ struct car_status{
 };
 int move_speed=100 ;
 int car_direction = 1; // 1 means forward, 0 gear backward
-
+int status=0;
 #define MID_SPEED 80   
 #define HIGH_SPEED 100    
 #define LOW_SPEED 60   
@@ -275,6 +275,8 @@ void tracking()
   
   Serial.print(senstr);
   Serial.print("\t");
+  Serial.print("\n");
+ 
  
 
   if (senstr=="01000" || senstr=="11000")
@@ -286,7 +288,7 @@ void tracking()
       stop_bot();     
    }
    
-  if ( senstr=="11100" || senstr=="10100" )
+  if (senstr=="10000" || senstr=="11100" || senstr=="10100" )
   {
      Serial.println("Slight Shift Left");
       forward(0,HIGH_SPEED);
@@ -319,18 +321,18 @@ void tracking()
       delay(DELAY_TIME);
       stop_bot(); 
   }
- if (senstr=="00010" || senstr=="00011")
+ if (senstr=="00001"||senstr=="00010" || senstr=="00011")
  {
    Serial.println("Shift to Right");
-  // sharpRightTurn(MID_SPEED,LOW_SPEED);
-    forward(LOW_SPEED,LOW_SPEED);
+   sharpRightTurn(MID_SPEED,LOW_SPEED);
+   // forward(LOW_SPEED,LOW_SPEED);
     //  right_shift(HIGH_SPEED,HIGH_SPEED,HIGH_SPEED,HIGH_SPEED);
       delay(DELAY_TIME);
       stop_bot();   
         
  }
   if (  senstr=="00000"){
-      reverse(MID_SPEED);
+      forward(HIGH_SPEED,HIGH_SPEED);
       delay(DELAY_TIME/2*3);
       stop_bot();  
   }
@@ -345,7 +347,6 @@ void tracking()
 
 void do_Uart_Tick()
 {char Uart_Date=0;
-int status=0;
   if(Serial1.available()) 
   {
     size_t len = Serial1.available();
@@ -416,20 +417,25 @@ int status=0;
  //4,8,7,5
    Serial.print(status);
    Serial.print("\n");
-   delay(100);
-/*
+
 
    while(status==5){
      tracking();
+      if(buffUARTIndex > 0 && (millis() - preUARTTick >= 100))//APP send flag to modify the obstacle avoidance parameters
+   { //data ready
     buffUART[buffUARTIndex] = 0x00;
     Uart_Date=buffUART[0];
     cs=get_status(buffUART);
     car_direction=cs.angle;
     buffUARTIndex = 0;
+
       if(Uart_Date=='I'){
         status=0;
+        stop_bot(); 
         break;
       }
-   }*/
+    }
+
+   }
   
 }
