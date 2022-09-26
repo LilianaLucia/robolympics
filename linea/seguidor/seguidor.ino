@@ -278,76 +278,27 @@ void tracking()
   Serial.print("\t");
   Serial.print("\n");
  
- 
+  if(senstr=="11011" || senstr=="10011" || senstr=="11001" || senstr=="00000" ||  senstr=="10001" || s2==0){
+    forward(HIGH_SPEED,HIGH_SPEED);
+   }
 
-  if ( senstr=="01000" || senstr=="11000")
+  else if ( senstr=="01111" || senstr=="10111" || senstr=="00111" || senstr=="00011" || s0 == 0 ||  s1 == 0)
    {
      Serial.println(" Shift Left");
-      sharpLeftTurn(LOW_SPEED,MID_SPEED);
-    //  left_shift(HIGH_SPEED,HIGH_SPEED,HIGH_SPEED,HIGH_SPEED);
-      delay(DELAY_TIME);
-      stop_bot();     
+      sharpLeftTurn(HIGH_SPEED,HIGH_SPEED);
+      // delay(DELAY_TIME);
+      // stop_bot();     
    }
 
-   if(senstr=="10000"){
-    sharpRightTurn(LOW_SPEED,0);
+   else if(senstr=="11110" || senstr=="11101" || senstr=="11100" ||  senstr=="00001" || senstr=="11000" || s3 == 0 ||  s4 == 0){
+   sharpRightTurn(HIGH_SPEED,HIGH_SPEED);
+
+   }else if(senstr=="11111"){
+      reverse(LOW_SPEED);
    }
-   
-  if ( senstr=="11100" || senstr=="10100" )
-  {
-     Serial.println("Slight Shift Left");
-      forward(0,HIGH_SPEED);
-      delay(DELAY_TIME);
-      stop_bot(); 
-  }
-  if ( senstr=="01100" ||  senstr=="11110"  || senstr=="10010"  || senstr=="10110"  || senstr=="11010")
-  {
-     Serial.println("Slight Left");
-      forward(LOW_SPEED,MID_SPEED);
-      delay(DELAY_TIME);
-  }
- if (senstr=="01110" || senstr=="01010" || senstr=="00100"  || senstr=="10001"  || senstr=="10101"  || senstr=="10011" || senstr=="11101" || senstr=="10111" || senstr=="11011"  || senstr=="11001")
-  {
-     Serial.println("Forward");
-      forward(MID_SPEED,MID_SPEED);
-      delay(DELAY_TIME);
-       stop_bot(); 
-  }
- if ( senstr=="00110" || senstr=="01111" || senstr=="01001" || senstr=="01011" || senstr=="01101")
-  {
-        Serial.println("Slit Right");
-      forward(MID_SPEED,LOW_SPEED);
-      delay(DELAY_TIME);
-       stop_bot(); 
-  }
- if (senstr=="00111" || senstr=="00101" )
-  {    Serial.println("Slight Shift to Right ");
-       forward(HIGH_SPEED,0);
-      delay(DELAY_TIME);
-      stop_bot(); 
-  }
- if (senstr=="00001"||senstr=="00010" || senstr=="00011")
- {
-   Serial.println("Shift to Right");
-   sharpLeftTurn(MID_SPEED,LOW_SPEED);
-   // forward(LOW_SPEED,LOW_SPEED);
-    //  right_shift(HIGH_SPEED,HIGH_SPEED,HIGH_SPEED,HIGH_SPEED);
-      delay(DELAY_TIME);
-      stop_bot();   
-        
- }
-  if (  senstr=="00000"){
-      forward(LOW_SPEED,LOW_SPEED);
-      delay(DELAY_TIME/2*3);
-      stop_bot();  
-  }
- if (  senstr=="11111")
- {
-   Serial.println("Sharp Right U Turn");
-      sharpRightTurn(MID_SPEED,MID_SPEED);
-      delay(DELAY_TIME);
-      stop_bot();     
- }
+   else{
+     sharpRightTurn(LOW_SPEED,0);
+   }
 }
 
 void do_Uart_Tick()
@@ -384,19 +335,7 @@ void do_Uart_Tick()
  
   switch (Uart_Date)    //serial control instructions
   {
-    case 'M':  
-    //    status=1;
-    break;
-    
-    case 'L':  //status=1;
-
-    break;
-    case 'B': // status=2;
-
-    break;
-
-    break;
-    case 'Y':// status=3;
+  
 
     break;
      case 'F': status=4;
